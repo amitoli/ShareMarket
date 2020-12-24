@@ -27,7 +27,7 @@ public class OptionChain
 	private static final String OUTPUT_FILE_NAME = "Option Chain Data.csv";
 	private static final String UNDERLYING_INDEX = "BANKNIFTY";
 	private static final String INPUT_JSON_FILE_ABSOLUTE_PATH = "C:\\Projects\\Work\\mkt\\options\\temp.json";
-	private static final boolean CALL_REST_API = true;
+	private static final boolean CALL_REST_API = false;
 
 
 	public void buildOptionChainData() throws IOException
@@ -71,8 +71,14 @@ public class OptionChain
 
 			for (int i = 0; i < records.length() ; i++)
 			{
-				callsFromJson.add(records.getJSONObject(i).getJSONObject("CE"));
-				putsFromJson.add(records.getJSONObject(i).getJSONObject("PE"));
+				if(records.getJSONObject(i).has("CE")){
+					callsFromJson.add(records.getJSONObject(i).getJSONObject("CE"));
+				}
+
+				if(records.getJSONObject(i).has("PE")){
+					putsFromJson.add(records.getJSONObject(i).getJSONObject("PE"));
+				}
+
 			}
 			//System.out.println(putsFromJson);
 
@@ -187,7 +193,7 @@ public class OptionChain
 						.header("TE", "Trailers")
 						.header("Upgrade-Insecure-Requests", "1")
 						.header("Cache-Control", "max-age=0")
-						//.header("Host","www.nseindia.com")
+						.header("Host","www.nseindia.com")
 						//.header("Cookie", "_ga=GA1.2.92378258.1593367993; ak_bmsc=E837F6A7373AA6CEDA10F79A37534358ACE82CB7A2310000E374E05FE3C61459~pldeqU0C7HNoDy0WBtacHQkDr37oH/MZYseYpGUVZgpTdkWV1jxw/Y5AmrgTlwVph1rNNNoghijvkKJjWZ2t5VzGlp/OqG5s2bqKNyjo3VRNCl7XjN2h1qolyF1/FBCdZTDeHU4DyXVNltN+JXEj0XxYXtVMY4updBrBJJ3xQLJ2t3hOMT91WKwA3/kNDyGyJKohkRzk0DoPak8FPimFPR1OYN8S+PzIZUUZoSCFSYV2uGG+0TtzMlpLqbZY7RPpJK; bm_sv=25EC1B7465E33423F7D37785A91539EA~md8ENnCf+jyVqwbUUf/ZNt96Fm8zQVDMfFAgRZCw7ulESCAYsGJ3CGxrs41/DLMi8ME2yZKa7vlPpzs1j2oiZwjXfmWZLM0amR5agCO8vDJaFRbcfQNSYZdZL8zxntsoK87Nf5Z0gvWAE+3lCiLRJg0xwlAiilSkq8cJqAlts+o=; nsit=yV8cNn6pNHM8_4BPHh6VSeJY; nseappid=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcGkubnNlIiwiYXVkIjoiYXBpLm5zZSIsImlhdCI6MTYwODU0NTYwOSwiZXhwIjoxNjA4NTQ5MjA5fQ.yBFSkEHo6-_j6XHX1rG0lNrZCh7omSSJ9gN7A8vchhU; bm_mi=28860EFE12D0A95AD540F37405EAEE5C~KvOs0G+6SJGxgkNByC7IQak5S32698PSNzHhBBEhnIEV+4xIRT/XbNsO48DQayBQ1s2Ff72GKumnXTNLKcW/cbBcThzn+5weFn4qfQhSHZH3WbQ66JfVqICaMYt4s+IqEZgkVZ9pbriLTAu7fs0RWj9cIfOySt2TDL+kgoAXyZRXMyUgxJSMwSrGxxdvhBusJ3HdyVI0A5G0ROHUKGzj7CRH2oflJysuoGFzE9WXcfdq9nGZgoN8LXqeW3y2sl4tt+uGSay0NjQqXBkQfZ9TUWqKwQO5XfkLFAIPKkyAEn8=; RT=\"z=1&dm=nseindia.com&si=ca5a3cc8-0942-408b-8b08-c094b96f3743&ss=kiyeivq4&sl=1&tt=43k&bcn=%2F%2F173e255d.akstat.io%2F&ld=dpk\"; _gid=GA1.2.645798177.1608545619")
 						.url(url)
 						.build();
