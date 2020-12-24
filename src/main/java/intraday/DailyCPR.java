@@ -8,7 +8,10 @@ import java.util.Map;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
+/*
 
+https://www.nseindia.com/api/equity-stockIndices?csv=true&index=NIFTY%2050
+ */
 public class DailyCPR
 {
 	public static void main(String[] args) throws IOException

@@ -22,26 +22,27 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import util.SendMail;
+import util.EmailUtility;
 
 public class Promoter
 {
-	static boolean USE_DOWNLOADED_CSV = true;
+	static final boolean USE_DOWNLOADED_CSV = false;
+	static final String OUTPUT_FILE_PATH = "C:\\Projects\\Work\\mkt\\output.csv";
 	public static void main(String[] args) throws IOException
 	{
-		String output = "C:\\Projects\\Work\\mkt\\output.csv";
+
 		Response response = null;
-		String yesterday = "";
+		String yesterday = null;
 		//String today = dtf.format(ltoday);
 		String today = "";
 		if(!USE_DOWNLOADED_CSV){
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 			LocalDateTime ltoday = LocalDateTime.now();
 			LocalDateTime lyesterday = LocalDateTime.now().minusDays(1);
-			//String yesterday = dtf.format(lyesterday);
-			yesterday = "21-09-2020";
-			//String today = dtf.format(ltoday);
-			today = "27-09-2020";
+			yesterday = dtf.format(lyesterday);
+			//yesterday = "20-10-2020";
+			today = dtf.format(ltoday);
+			//today = "27-10-2020";
 
 			OkHttpClient client = new OkHttpClient();
 			HttpUrl.Builder urlBuilder =
@@ -55,17 +56,17 @@ public class Promoter
 
 			Request request =
 					new Request.Builder()
-							//.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:79.0) Gecko/20100101 Firefox/79.0")
-							//.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0")
 							.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0")
 							//.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
 							.header("Accept", "*/*")
+							.header("Host","www.nseindia.com")
 							.header("Connection", "keep-alive")
 							//.header("Accept-Encoding", "gzip, deflate, br")
 							.header("Accept-Language", "en-US,en;q=0.5")
-							.header("Referer", "https://www.nseindia.com/companies-listing/corporate-filings-insider-trading")
+							.header("Upgrade-Insecure-Requests", "1")
+							//.header("Referer", "https://www.nseindia.com/companies-listing/corporate-filings-insider-trading")
 							.header("TE", "Trailers")
-							.header("Cookie", "_ga=GA1.2.92378258.1593367993; RT=\\\"z=1&dm=nseindia.com&si=cdb302fe-650d-4b53-8058-ff57ebcb7f63&ss=kfbwqgsh&sl=0&tt=0&bcn=%2F%2F684fc53f.akstat.io%2F&ld=4bfhrc&nu=ed8553192c8d124be55949cc1b2e99dc&cl=d0u\\\"; ak_bmsc=9C6367419FDFBD958C4F886940B1E9C0173F6D0460370000620E685F94772C33~plv6W4geajFJePSnZPDli8ba6itEWMWkohVYC6Nj0v307DF67a8SPXH5OjYxlfpKMMEiSWf9o8/ueUnr8qYskT6VQjy1qOTXYza5MQf25Dtmez+htGwbw277V/gtoe65+0DwRmYLKG4mzSRp3gMxD55aWSRO9I49HW9yZW+93v4FwIRJUThUEWYlHDYELSleEG+D53Y3ifz0WVCMvSW/ChVupTyarPEBym+GfvkFc0PH9NOo24B+7ElV9DJtSiB0Om; bm_sv=CEC96D6E28B01C9F75F48780D3F0DB9B~9e6zv9JVooxx7/fTUoHg4Vjhbhq+M48l+CPnqQyZvEE7jvM4HhxsgikSmchWaB4/LP5QQmowN1g7ENO0MrceA1New97+NgLvUaLTpqxC7lHVKqG7Aa6/fblDQb6YbFKXH0U2Y4VR4aXwWP7NghWaBgFyyuB+kR7qPWCLbA2ji9U=; nsit=FCzLlI4c-Go7DrPMSmmFc3Ho; nseappid=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcGkubnNlIiwiYXVkIjoiYXBpLm5zZSIsImlhdCI6MTYwMDY1NTEyNCwiZXhwIjoxNjAwNjU4NzI0fQ.kl9MWmmk3Awvv4-bUNtleaNX_8hNLnGRnha01CUN1UY; bm_mi=B1030A75B350C117AE86A3E5F4621A9D~hLueSp5xyQ4TiUABpZmgxXX0FZb3Ur9dusyqyNfTfyekVQUm83XVvybV6f7z9RK4XHQTkn9HX08XMoQ0NRPGs4S/Xn0YywAfaFLtgB6qxVVFEKghWAV/jCB5SlKQ5ejt/oASRhdB6SV3+D+7wX7lQs/kLy0WZH+0c7uL5RF5M7lXSe+fXjFTN6aJfbeaa1WKJGOa7ajtt22IkJbu3tcb1PWJC199iUKtD2+PK8cDd8AXHsEDjhj5hDi4McPoa30NkKTyFsGSsa4EDNXWZIm6/IcdXbfgUpssO4/tEVNX1KyBS4OwQP8rE0yWmaTnu5LKUOiTXKhUlQPHmXXK7hywKQ==; _gid=GA1.2.1633423947.1600655131; _gat_UA-143761337-1=1")
+							.header("Cookie", "_ga=GA1.2.92378258.1593367993; RT=\"z=1&dm=nseindia.com&si=ca5a3cc8-0942-408b-8b08-c094b96f3743&ss=kj0ttc8h&sl=1&tt=311&bcn=%2F%2F684fc53d.akstat.io%2F&ld=5b5&nu=ed8553192c8d124be55949cc1b2e99dc&cl=a4q\"; ak_bmsc=9C27E6140B1D6CEA7FE5C2A3D2770DB217394A50C2630000DDB1E25FDC7B6C53~pl7O/RNPWFzMuejAuWDsGzkK0+GqzY79+3hp9x0Lr1bOWe8dNbeZ7bpCLL4vjCjYNbc8Z/JRdgwmgRrBGIVb+5MzvZO+OotJ6aFFvxrTJ633FpQfaJQFrg/Idv+aX1PDG86bOqtmKRwGXTb0C+9HTO2wciUSO/vfR864gwVocROb5rn0fsWWb25OWLOKAf4FybgUjzBAEvwk+cJqjV8y5Y+CnpUpQE7mRbUQip8ohDLD5LDpsEDP7sfQjnKKXpdJ0a; bm_sv=A7FA9E9C31AF2D66639CCA7379FE906B~maL8S5BOm/sBwV6DJmDlyGZtEan2BFFMErg1GU27EL2T2gFaHrT+joMOG96xMUemGLJUwY+d49LgySOqUuE3LRoqgs7gJ/EjBIyN3rVDMQKMaiV6Bi1O4aQvnH0cA/UYaZ5j+EvzMQSsfOuQueVx62imFdryqm0nFtBcVc2MmjY=; nsit=tWtmSs8V0ZgWflgmTz60kngt; nseappid=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcGkubnNlIiwiYXVkIjoiYXBpLm5zZSIsImlhdCI6MTYwODY5MjIyNCwiZXhwIjoxNjA4Njk1ODI0fQ.NYUnCmidHFXg0NJvw1iaZKWAVXIGJyewpPn9XLNXi3g; bm_mi=A9840D1777A2E60B83CE2C266689A4A4~rjHwkL+FaWbjRuCOc1+OGKhwR/OQUVD6/8D6jLsXE3s6fif2RN7nGXfzdUMhZ7K0Lo69AUH2++ctDQlgaZhQBd+4a43t/lYBQgKat9XOVMxd9KQ6ZuJx07FmUePKPqTOdTLNMLOaOMd1/RI8VyIRF5chKMO7m0Jqh50OByc2oNZbMSI3vW0SlOyIexpsntdlmGc5rPcPOgwtpQqVUV9C9bc6z/X5MYc617EIXbchnOwGBOnHNvhbqi9xhptmV5Ekj/hx2lfKkVLr/ba2DoJGo6RdjSGqpYOFk/z3lEZwZXog/Xl0iJXxfHQGBm6wQLnOs06FocE0gh29BPYxrYC8gA==; _gid=GA1.2.1558642155.1608692230")
 							.url(url)
 							.build();
 			response = client.newCall(request).execute();
@@ -126,7 +127,7 @@ public class Promoter
 		for(Map.Entry<String,Long> l : list){
 			keySortedMap.put(l.getKey(),l.getValue());
 		}
-		CSVWriter writer = new CSVWriter(new FileWriter(output));
+		CSVWriter writer = new CSVWriter(new FileWriter(OUTPUT_FILE_PATH));
 		String [] header = {"Stock","Total","Total(in lakhs)","NIFTY 500 ?","FnO Stock ?"};
 		writer.writeNext(header);
 		for (Map.Entry<String,Long> entry : keySortedMap.entrySet()){
@@ -139,12 +140,12 @@ public class Promoter
 		}
 		writer.close();
 
-		SendMail sendMail = new SendMail();
+		EmailUtility emailUtility = new EmailUtility();
 		if(USE_DOWNLOADED_CSV){
-			sendMail.send("Promoter Data ",output,"Promoter Data"+".csv");
+			emailUtility.send("Promoter Data ",OUTPUT_FILE_PATH,"Promoter Data"+".csv");
 		}
 		else{
-			sendMail.send("Promoter Data " + yesterday + "-to-" + today,output,"Promoter Data "+ yesterday + "-to-" + today+".csv");
+			emailUtility.send("Promoter Data " + yesterday + "-to-" + today,OUTPUT_FILE_PATH,"Promoter Data "+ yesterday + "-to-" + today+".csv");
 		}
 
 

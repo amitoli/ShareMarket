@@ -16,11 +16,12 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-public class SendMail {
+public class EmailUtility
+{
 	private static String RECIPIENT1 = "amitoli2012@gmail.com";
-	private static String RECIPIENT2 = "kamalmedhi68@gmail.com";
+	//private static String RECIPIENT2 = "kamalmedhi68@gmail.com";
 	private static String RECIPIENT3 = "kamalmedhi68@gmail.com";
-	private static String[] to = { RECIPIENT1,RECIPIENT2 };
+	private static String[] to = { RECIPIENT1 };
 /*	public static void main(String[] args) {
 
 		final String FROM_USER_NAME = "nsebseupdates@gmail.com";
@@ -46,7 +47,7 @@ public class SendMail {
 			message.setFrom(new InternetAddress("nsebseupdates@gmail.com"));
 			message.setRecipients(Message.RecipientType.TO,
 					InternetAddress.parse("amitoli2012@gmail.com"));
-			message.setSubject("promoterdata.Promoter Details");
+			message.setSubject("Promoter Details");
 			//message.setText("Dear Mail Crawler," + "\n\n No spam to my email, please!");
 			MimeBodyPart messageBodyPart = new MimeBodyPart();
 			Multipart multipart = new MimeMultipart();
