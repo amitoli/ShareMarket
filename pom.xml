@@ -78,7 +78,11 @@
             <artifactId>spring-web</artifactId>
             <version>4.3.11.RELEASE</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.angelbroking</groupId>
+            <artifactId>smartapi</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

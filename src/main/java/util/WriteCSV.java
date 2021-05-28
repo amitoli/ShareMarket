@@ -8,7 +8,7 @@ import com.opencsv.CSVWriter;
 
 public class WriteCSV
 {
-	static final String OUTPUT_FILE_PATH = "C:\\Projects\\Work\\mkt\\";
+	static final String OUTPUT_FILE_PATH = "C:\\Projects\\Work\\mkt\\output\\";
 
 	public static void write(String outputFileName,String [] header,String [] row)
 	{

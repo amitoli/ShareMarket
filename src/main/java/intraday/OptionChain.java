@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,34 +24,68 @@ public class OptionChain
 {
 	private static final int NO_OF_STRIKE_PRICES_TO_CONSIDER=5;
 	private static final String OUTPUT_FILE_NAME = "Option Chain Data.csv";
-	private static final String UNDERLYING_INDEX = "BANKNIFTY";
+	private static final String INSTRUMENT_NAME = "BANKNIFTY";
+	private static final boolean EQUITY = false;
+	private static String OPTION_CHAIN_URL;
 	private static final String INPUT_JSON_FILE_ABSOLUTE_PATH = "C:\\Projects\\Work\\mkt\\options\\temp.json";
-	private static final boolean CALL_REST_API = false;
+	private static final String OUTPUT_FILE_PATH = "C:\\Projects\\Work\\mkt\\output\\Option Chain Data.csv";
+	private static final int THREAD_SLEEP_DURATION = 10000;
+	private static final boolean CALL_REST_API = true;
+	static{
+		if(EQUITY){
+			OPTION_CHAIN_URL= "https://www.nseindia.com/api/option-chain-equities";
+		}
+		else{
+			OPTION_CHAIN_URL= "https://www.nseindia.com/api/option-chain-indices";
+		}
+	}
+	public static void main(String[] args) throws IOException, InterruptedException {
+/*		for(String instrument : INSTRUMENT_NAMES){
 
+		}*/
+		OptionChain optionChain = new OptionChain();
+		optionChain.buildOptionChainData();
+		//optionChain.sendEmail();
+	}
 
-	public void buildOptionChainData() throws IOException
-	{
+	public void buildOptionChainData() throws IOException, InterruptedException {
 		JSONObject responseBody = null;
+		Request request;
+		Response response;
 		if(CALL_REST_API){
-			Response response = null;
-			Request request = buildHttpRequest();
-			response = httpCall(request);
-			try
-			{
-				responseBody = new JSONObject(response.body().string());
-			}
-
-			catch (JSONException e)
-			{
+			while(true){
+				request = buildHttpRequest();
 				response = httpCall(request);
-				System.out.println(response.body().string());
-				responseBody = new JSONObject(response.body().string());
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
+				try
+				{
+					String responseString = response.body().string();
+					//System.out.println("Print raw response body "+ responseString);
 
+					if(responseString.charAt(0)=='{'){
+						System.out.println("Valid JSON Response. Breaking while loop");
+						responseBody = new JSONObject(responseString);
+						break;
+					}
+					else{
+						System.out.println("Invalid JSON Response. Retrying");
+						Thread.sleep(THREAD_SLEEP_DURATION);
+						continue;
+					}
+				}
+
+				catch (JSONException e)
+				{
+					System.out.println("In JSON Exception");
+					e.printStackTrace();
+					Thread.sleep(THREAD_SLEEP_DURATION);
+					response = httpCall(request);
+					responseBody = new JSONObject(response.body().string());
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
 		}
 		else{
 			System.out.println("hello");
@@ -61,6 +94,7 @@ public class OptionChain
 			responseBody = new JSONObject(input);
 			//System.out.println(responseBody);
 		}
+
 
 		try
 		{
@@ -101,7 +135,7 @@ public class OptionChain
 				putOptions.add(options);
 			});
 
-			Double underlyingValue = (Double) putsFromJson.get(0).get("underlyingValue");
+			Double underlyingValue = Double.parseDouble(putsFromJson.get(0).get("underlyingValue").toString());
 
 			Collections.sort(callOptions,(sp1,sp2)->sp2.getStrikePrice()-sp1.getStrikePrice());
 			//Collections.sort(putOptions,(sp1,sp2)->sp1.getStrikePrice()-sp2.getStrikePrice());
@@ -160,6 +194,7 @@ public class OptionChain
 
 			System.out.println("sumCE - "+sumOfCE);
 			System.out.println("sumPE - "+sumOfPE);
+			System.out.println("Diff - "+ (sumOfPE - sumOfCE));
 
 			writeInCSV(sumOfCE,sumOfPE);
 		}
@@ -167,18 +202,15 @@ public class OptionChain
 		{
 			e.printStackTrace();
 		}
-	}
-	public static void main(String[] args) throws IOException
-	{
-		OptionChain optionChain = new OptionChain();
-		optionChain.buildOptionChainData();
-		//optionChain.sendEmail();
+		finally {
+			response.close();
+		}
 	}
 
 	private Request buildHttpRequest(){
 		HttpUrl.Builder urlBuilder =
-				HttpUrl.parse("https://www.nseindia.com/api/option-chain-indices").newBuilder();
-		urlBuilder.addQueryParameter("symbol", UNDERLYING_INDEX);
+				HttpUrl.parse(OPTION_CHAIN_URL).newBuilder();
+		urlBuilder.addQueryParameter("symbol", INSTRUMENT_NAME);
 
 		String url = urlBuilder.build().toString();
 		System.out.println(url);
@@ -218,13 +250,13 @@ public class OptionChain
 			indication = "BEAR CARTEL";
 			System.out.println("BEAR CARTEL");
 		}
-		String [] headers = {"SumOfCE","SumOfPE","Difference","Indication","Timestamp"};
-		String [] row = {sumOfCE.toString(),sumOfPE.toString(),diff.toString(),indication,LocalDateTime.now().toString()};
+		String [] headers = {"Symbol","SumOfCE","SumOfPE","Difference","Indication","Timestamp"};
+		String [] row = {INSTRUMENT_NAME,sumOfCE.toString(),sumOfPE.toString(),diff.toString(),indication,LocalDateTime.now().toString()};
 		WriteCSV.write(OUTPUT_FILE_NAME,headers,row);
 	}
 
 	private void sendEmail(){
 		EmailUtility emailUtility = new EmailUtility();
-		emailUtility.send("Option Chain Data "+LocalDateTime.now().toString(),OUTPUT_FILE_NAME,OUTPUT_FILE_NAME);
+		emailUtility.send("Option Chain Data "+LocalDateTime.now().toString(),OUTPUT_FILE_PATH,OUTPUT_FILE_NAME);
 	}
 }
